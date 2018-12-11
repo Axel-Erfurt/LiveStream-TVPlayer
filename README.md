@@ -1,6 +1,7 @@
 # LiveStream-TVPlayer
 
-Requirements:
+__Requirements:__
+
 - python2 or python3
 - PyQt5
 - m3u8
