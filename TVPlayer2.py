@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.mediaPlayer.setVolume(100)
         self.mediaPlayer.error.connect(self.handleError)
+        self.mediaPlayer.bufferStatusChanged.connect(self.bufferingProgress)
 
         self.videoWidget = QVideoWidget(self)
         self.videoWidget.setAspectRatioMode(1)
@@ -83,21 +84,23 @@ class MainWindow(QMainWindow):
 
         self.myinfo = "TV-Player\n©2018\nAxel Schneider\n\nq = Exit\nf = toggle Fullscreen\n"
         print("Welcome to TV Player & Recorder")
-        if self.is_tool("streamlink"):
-            print("found streamlink\nrecording enabled")
+        if self.is_tool("streamlink") == True:
             self.recording_enabled = True
         else:
             self.msgbox("streamlink not found\nNo recording available")
         self.getLists()
         self.play_ARD()
 
+    def bufferingProgress(self, progress):
+        print("%s %d%s" % ("Buffering:", progress, "%"))
+
     def recfinished(self):
         print("recording finished 1")
 
     def is_tool(self, name):
         tool = QStandardPaths.findExecutable(name)
-        if tool is not None:
-            print(tool)
+        if not tool == "":
+            print("%s %s %s" %("found streamlink on", tool, "\nrecording enabled"))
             return True
         else:
             return False
@@ -266,9 +269,10 @@ class MainWindow(QMainWindow):
 
     def contextMenuRequested(self, point):
         channels_menu = QMenu()
+        c_menu = channels_menu.addMenu(QIcon.fromTheme("tv-symbolic"), "Channels")
         for url in self.urlList:
             kanal = url.rpartition(".")[0].rpartition("/")[2].upper()
-            m = channels_menu.addMenu(QIcon.fromTheme("tv-symbolic"),kanal)
+            m = c_menu.addMenu(QIcon.fromTheme("tv-symbolic"),kanal)
             m.setObjectName(kanal)
             self.menulist.append(kanal)
 
@@ -284,6 +288,7 @@ class MainWindow(QMainWindow):
 #                        m.addAction(a)
                         m.addMenu(QIcon.fromTheme("tv-symbolic"), res).addAction(a)
 
+#        channels_menu.addMenu(c_menu)
         channels_menu.addSeparator()
 
         about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
@@ -308,7 +313,7 @@ class MainWindow(QMainWindow):
             tv_record2 = QAction(QIcon.fromTheme("media-record"), "record without timer (w)", triggered = self.recordNow2)
             channels_menu.addAction(tv_record2)
 
-            tv_record_stop = QAction(QIcon.fromTheme("player-stop"), "stop recording (s)", triggered = self.stop_recording)
+            tv_record_stop = QAction(QIcon.fromTheme("media-playback-stop"), "stop recording (s)", triggered = self.stop_recording)
             channels_menu.addAction(tv_record_stop)
     
             channels_menu.addSeparator()
