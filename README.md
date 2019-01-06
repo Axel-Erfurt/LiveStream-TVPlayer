@@ -1,4 +1,4 @@
-# LiveStream-TVPlayer
+# TV LiveStream-Player & Recorder
 
 __Requirements:__
 
