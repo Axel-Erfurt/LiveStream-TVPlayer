@@ -13,6 +13,7 @@ from PyQt5.QtMultimediaWidgets import QVideoWidget
 import m3u8
 import os
 from time import sleep
+import subprocess
 import sys
 
 class MainWindow(QMainWindow):
@@ -39,7 +40,6 @@ class MainWindow(QMainWindow):
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.mediaPlayer.setVolume(100)
         self.mediaPlayer.error.connect(self.handleError)
-        self.mediaPlayer.bufferStatusChanged.connect(self.bufferingProgress)
 
         self.videoWidget = QVideoWidget(self)
         self.videoWidget.setAspectRatioMode(1)
@@ -84,23 +84,21 @@ class MainWindow(QMainWindow):
 
         self.myinfo = "TV-Player\n©2018\nAxel Schneider\n\nq = Exit\nf = toggle Fullscreen\n"
         print("Welcome to TV Player & Recorder")
-        if self.is_tool("streamlink") == True:
+        if self.is_tool("streamlink"):
+            print("found streamlink\nrecording enabled")
             self.recording_enabled = True
         else:
             self.msgbox("streamlink not found\nNo recording available")
         self.getLists()
         self.play_ARD()
 
-    def bufferingProgress(self, progress):
-        print("%s %d%s" % ("Buffering:", progress, "%"))
-
     def recfinished(self):
         print("recording finished 1")
 
     def is_tool(self, name):
         tool = QStandardPaths.findExecutable(name)
-        if not tool == "":
-            print("%s %s %s" %("found streamlink on", tool, "\nrecording enabled"))
+        if tool is not None:
+            print(tool)
             return True
         else:
             return False
@@ -221,11 +219,20 @@ class MainWindow(QMainWindow):
         else:
             self.rect = self.geometry()
             self.showFullScreen()
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.fullscreen = True
             print("Fullscreen entered")
         if self.fullscreen == False:
             self.showNormal()
             self.setGeometry(self.rect)
+            QApplication.setOverrideCursor(Qt.BlankCursor)
+        self.handleCursor()
+
+    def handleCursor(self):
+        if  QApplication.overrideCursor() ==  Qt.ArrowCursor:
+            QApplication.setOverrideCursor(Qt.BlankCursor)
+        else:
+            QApplication.setOverrideCursor(Qt.ArrowCursor)
     
     def handleQuit(self):
         self.mediaPlayer.stop()
@@ -235,6 +242,8 @@ class MainWindow(QMainWindow):
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Q:
             self.handleQuit()
+        elif e.key() == Qt.Key_H:
+            self.handleCursor()
         elif e.key() == Qt.Key_F:
             self.handleFullscreen()
         elif e.key() == Qt.Key_M:
@@ -257,6 +266,12 @@ class MainWindow(QMainWindow):
             self.play_ZDF()
         elif e.key() == Qt.Key_3:
             self.play_MDR()
+        elif e.key() == Qt.Key_4:
+            self.play_Phoenix()
+        elif e.key() == Qt.Key_5:
+            self.play_Sport1()
+        elif e.key() == Qt.Key_Z:
+            self.play_Info()
         else:
             e.accept()
 
@@ -265,7 +280,7 @@ class MainWindow(QMainWindow):
         for entry in os.listdir(the_folder):
             if str(entry).endswith(".m3u8"):
                 self.urlList.append(the_folder + "/" + str(entry))
-                self.urlList.sort()
+        self.urlList.sort()
 
     def contextMenuRequested(self, point):
         channels_menu = QMenu()
@@ -275,7 +290,6 @@ class MainWindow(QMainWindow):
             m = c_menu.addMenu(QIcon.fromTheme("tv-symbolic"),kanal)
             m.setObjectName(kanal)
             self.menulist.append(kanal)
-
             variant_m3u8 = m3u8.load(url)
             variant_m3u8.is_variant
     
@@ -285,10 +299,11 @@ class MainWindow(QMainWindow):
                     res = str(playlist.stream_info.resolution[0])
                     if res in self.resolutions:
                         a = QAction(QIcon.fromTheme('browser'), playlist.uri, self, triggered=self.playTV)
-#                        m.addAction(a)
                         m.addMenu(QIcon.fromTheme("tv-symbolic"), res).addAction(a)
 
-#        channels_menu.addMenu(c_menu)
+        a = QAction(QIcon.fromTheme('browser'), "Sport1 Live", self, triggered=self.play_Sport1)
+        c_menu.addAction(a)
+
         channels_menu.addSeparator()
 
         about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
@@ -337,6 +352,32 @@ class MainWindow(QMainWindow):
         self.link = "http://mdrthuhls-lh.akamaihd.net/i/livetvmdrthueringen_de@514027/index_1216_av-p.m3u8?sd=10&rebase=on"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
+
+    def play_Info(self):
+        self.link = "http://zdf1112-lh.akamaihd.net/i/de12_v1@392882/index_776_av-p.m3u8?sd=10&rebase=on"
+        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
+        self.mediaPlayer.play()
+
+    def play_Phoenix(self):
+        self.link = "https://zdf0910-lh.akamaihd.net/i/de09_v1@392871/index_750_av-p.m3u8?sd=10&rebase=on"
+        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
+        self.mediaPlayer.play()
+
+    def play_Sport1(self):
+        if not QStandardPaths.findExecutable("youtube-dl") == "":
+            cmd = "youtube-dl -g https://tv.sport1.de/sport1/"
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
+            (link, err) = proc.communicate()
+            print(link)
+            myurl = str(link).partition('\n')[0] #.partition("b'")[2].replace("\n", "")
+            if not myurl =="":
+                self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
+                self.link = myurl
+                self.mediaPlayer.play()
+            else:
+                msg = QMessageBox.about(self, "TVLive", "URL not found")
+        else:
+                msg = QMessageBox.about(self, "TVLive", "youtube-dl not found")
 
     def showLabel(self):
         self.lbl.show()
@@ -448,3 +489,4 @@ if __name__ == '__main__':
     mainWin = MainWindow()
     mainWin.show()
     sys.exit(app.exec_())
+
