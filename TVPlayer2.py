@@ -114,26 +114,12 @@ class MainWindow(QMainWindow):
                     res = str(playlist.stream_info.resolution[0])
                     if res in self.resolutions:
                         a = QAction(res + "p", self, triggered=self.playTV)
+                        a.setIcon(QIcon.fromTheme(mybrowser))
                         a.setData(playlist.uri)
                         rm = m.addAction(a)
 
         a = QAction(QIcon.fromTheme(mybrowser), "Sport1 Live", self, triggered=self.play_Sport1)
         self.c_menu.addAction(a)
-
-        self.channels_menu.addSeparator()
-
-        about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
-        self.channels_menu.addAction(about_action)
-
-        self.channels_menu.addSeparator()
-
-        url_action = QAction(QIcon.fromTheme(mybrowser), "play URL from clipboard (u)", triggered = self.playURL)
-        self.channels_menu.addAction(url_action)
-
-        self.channels_menu.addSeparator()
-
-        color_action = QAction(QIcon.fromTheme("preferences-color"), "Color Options (c)", triggered = self.showColorDialog)
-        self.channels_menu.addAction(color_action)
         ### end menu
     
     def dragEnterEvent(self, event):
@@ -359,6 +345,21 @@ class MainWindow(QMainWindow):
             self.channels_menu.addAction(tv_record_stop)
     
             self.channels_menu.addSeparator()
+
+        self.channels_menu.addSeparator()
+
+        about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
+        self.channels_menu.addAction(about_action)
+
+        self.channels_menu.addSeparator()
+
+        url_action = QAction(QIcon.fromTheme(mybrowser), "play URL from clipboard (u)", triggered = self.playURL)
+        self.channels_menu.addAction(url_action)
+
+        self.channels_menu.addSeparator()
+
+        color_action = QAction(QIcon.fromTheme("preferences-color"), "Color Options (c)", triggered = self.showColorDialog)
+        self.channels_menu.addAction(color_action)
 
         quit_action = QAction(QIcon.fromTheme("application-exit"), "Quit (q)", triggered = self.handleQuit)
         self.channels_menu.addAction(quit_action)
