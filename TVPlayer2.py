@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #############################################################################
 
-from PyQt5.QtCore import (QPoint, QRect, Qt, QUrl, QProcess, QFile, QDir, QTimer, QSize, pyqtSlot, QObject, QStandardPaths, QFileInfo, QCoreApplication)
+from PyQt5.QtCore import (QPoint, QRect, Qt, QUrl, QProcess, QFile, QDir, QTimer, QSize, QStandardPaths, QFileInfo, QCoreApplication)
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QMainWindow, QMessageBox, 
                                                     QMenu, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, 
@@ -15,6 +15,9 @@ import os
 from time import sleep
 import subprocess
 import sys
+
+mytv = "tv-symbolic"
+mybrowser = "video-television"
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -30,16 +33,20 @@ class MainWindow(QMainWindow):
         self.tout = 60
         self.outfile = "/tmp/TV.mp4"
 
+        self.channels_menu = QMenu()
+        self.c_menu = self.channels_menu.addMenu(QIcon.fromTheme(mytv), "Channels")
+
         self.process = QProcess()
         self.process.started.connect(self.getPID)
         self.process.finished.connect(self.timer_finished)
         self.process.finished.connect(self.recfinished)
 
 
-        self.resolutions = ["480", "512", "640", "720", "852",  "960", "1280"]
+        self.resolutions = ["480", "640", "852",  "960", "1280"]
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.mediaPlayer.setVolume(100)
         self.mediaPlayer.error.connect(self.handleError)
+        self.setAcceptDrops(True)
 
         self.videoWidget = QVideoWidget(self)
         self.videoWidget.setAspectRatioMode(1)
@@ -62,8 +69,6 @@ class MainWindow(QMainWindow):
         self.fullscreen = False
 
         self.setAttribute(Qt.WA_NoSystemBackground, True)
-#        self.setAttribute( Qt.WA_PaintOutsidePaintEvent, True )
-#        self.hasHeightForWidth()
         self.setMinimumSize(320, 180)
         self.setGeometry(0, 0, 480, 480 / 1.778)
 
@@ -90,7 +95,65 @@ class MainWindow(QMainWindow):
         else:
             self.msgbox("streamlink not found\nNo recording available")
         self.getLists()
+        self.makeMenu()
         self.play_ARD()
+
+    def makeMenu(self):
+        ## menu ##
+        for url in self.urlList:
+            res = ""
+            kanal = url.rpartition(".")[0].rpartition("/")[2].upper()
+            m = self.c_menu.addMenu(QIcon.fromTheme("video-display"),kanal)
+            m.setObjectName(kanal)
+            self.menulist.append(kanal)
+            variant_m3u8 = m3u8.load(url)
+            variant_m3u8.is_variant
+
+            for playlist in variant_m3u8.playlists:
+                if not playlist.stream_info.resolution == None:
+                    res = str(playlist.stream_info.resolution[0])
+                    if res in self.resolutions:
+                        a = QAction(res + "p", self, triggered=self.playTV)
+                        a.setData(playlist.uri)
+                        rm = m.addAction(a)
+
+        a = QAction(QIcon.fromTheme(mybrowser), "Sport1 Live", self, triggered=self.play_Sport1)
+        self.c_menu.addAction(a)
+
+        self.channels_menu.addSeparator()
+
+        about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
+        self.channels_menu.addAction(about_action)
+
+        self.channels_menu.addSeparator()
+
+        url_action = QAction(QIcon.fromTheme(mybrowser), "play URL from clipboard (u)", triggered = self.playURL)
+        self.channels_menu.addAction(url_action)
+
+        self.channels_menu.addSeparator()
+
+        color_action = QAction(QIcon.fromTheme("preferences-color"), "Color Options (c)", triggered = self.showColorDialog)
+        self.channels_menu.addAction(color_action)
+        ### end menu
+    
+    def dragEnterEvent(self, event):
+        if (event.mimeData().hasUrls()):
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        print("drop")
+        if event.mimeData().hasUrls():
+            url = event.mimeData().urls()[0].toString()
+            print("url = ", url)
+            self.mediaPlayer.stop()
+            self.mediaPlayer.setMedia(QMediaContent(QUrl(url)))
+            self.mediaPlayer.play()
+        elif event.mimeData().hasText():
+            mydrop =  event.mimeData().text()
+            print("generic url = ", mydrop)
+            self.mediaPlayer.setMedia(QMediaContent(QUrl(mydrop)))
+            self.mediaPlayer.play()
+            self.hideSlider()
 
     def recfinished(self):
         print("recording finished 1")
@@ -116,7 +179,7 @@ class MainWindow(QMainWindow):
             self.showLabel()
             print("recording to /tmp")
             self.is_recording = True
-            cmd = 'streamlink ' + self.link.replace("?sd=10&rebase=on", "") + ' best -o ' + self.outfile
+            cmd = 'streamlink --force ' + self.link.replace("?sd=10&rebase=on", "") + ' best -o ' + self.outfile
             print(cmd)
             self.process.startDetached(cmd)
 
@@ -138,9 +201,9 @@ class MainWindow(QMainWindow):
                 print("recording cancelled")
 
     def recordChannel(self):
-        cmd =  'timeout ' + str(self.tout) + ' streamlink ' + self.link.replace("?sd=10&rebase=on", "") + ' best -o ' + self.outfile
+        cmd =  'timeout ' + str(self.tout) + ' streamlink --force ' + self.link.replace("?sd=10&rebase=on", "") + ' best -o ' + self.outfile
         print(cmd)
-        print("recording to /tmp" + "with tiimeout: " + str(self.tout))
+        print("recording to /tmp with tiimeout: " + str(self.tout))
         self.lbl.update()
         self.is_recording = True
         self.process.start(cmd)
@@ -283,68 +346,32 @@ class MainWindow(QMainWindow):
         self.urlList.sort()
 
     def contextMenuRequested(self, point):
-        channels_menu = QMenu()
-        c_menu = channels_menu.addMenu(QIcon.fromTheme("tv-symbolic"), "Channels")
-        for url in self.urlList:
-            kanal = url.rpartition(".")[0].rpartition("/")[2].upper()
-            m = c_menu.addMenu(QIcon.fromTheme("tv-symbolic"),kanal)
-            m.setObjectName(kanal)
-            self.menulist.append(kanal)
-            variant_m3u8 = m3u8.load(url)
-            variant_m3u8.is_variant
-    
-            for playlist in variant_m3u8.playlists:
-#                if not playlist.stream_info.resolution == None and not "av-b" in playlist.uri:
-                if not playlist.stream_info.resolution == None:
-                    res = str(playlist.stream_info.resolution[0])
-                    if res in self.resolutions:
-                        a = QAction(QIcon.fromTheme('browser'), playlist.uri, self, triggered=self.playTV)
-                        m.addMenu(QIcon.fromTheme("tv-symbolic"), res).addAction(a)
-
-        a = QAction(QIcon.fromTheme('browser'), "Sport1 Live", self, triggered=self.play_Sport1)
-        c_menu.addAction(a)
-
-        channels_menu.addSeparator()
-
-        about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
-        channels_menu.addAction(about_action)
-
-        channels_menu.addSeparator()
-
-        url_action = QAction(QIcon.fromTheme("browser"), "play URL from clipboard (u)", triggered = self.playURL)
-        channels_menu.addAction(url_action)
-
-        channels_menu.addSeparator()
-
-        color_action = QAction(QIcon.fromTheme("preferences-color"), "Color Options (c)", triggered = self.showColorDialog)
-        channels_menu.addAction(color_action)
-
         if not self.recording_enabled == False:
-            channels_menu.addSeparator()
+            self.channels_menu.addSeparator()
     
             tv_record = QAction(QIcon.fromTheme("media-record"), "record (r)", triggered = self.recordNow)
-            channels_menu.addAction(tv_record)
+            self.channels_menu.addAction(tv_record)
 
             tv_record2 = QAction(QIcon.fromTheme("media-record"), "record without timer (w)", triggered = self.recordNow2)
-            channels_menu.addAction(tv_record2)
+            self.channels_menu.addAction(tv_record2)
 
             tv_record_stop = QAction(QIcon.fromTheme("media-playback-stop"), "stop recording (s)", triggered = self.stop_recording)
-            channels_menu.addAction(tv_record_stop)
+            self.channels_menu.addAction(tv_record_stop)
     
-            channels_menu.addSeparator()
+            self.channels_menu.addSeparator()
 
         quit_action = QAction(QIcon.fromTheme("application-exit"), "Quit (q)", triggered = self.handleQuit)
-        channels_menu.addAction(quit_action)
+        self.channels_menu.addAction(quit_action)
 
-        channels_menu.exec_(self.mapToGlobal(point))
+        self.channels_menu.exec_(self.mapToGlobal(point))
 
     def play_ARD(self):
-        self.link = "http://daserstehdde-lh.akamaihd.net/i/daserstehd_de@629196/index_1216_av-p.m3u8?sd=10&rebase=on"
+        self.link = "https://derste247livede.akamaized.net/hls/live/658317/daserste_de/master_1184.m3u8"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_ZDF(self):
-        self.link = "http://zdf1314-lh.akamaihd.net/i/de14_v1@392878/index_776_av-p.m3u8?sd=10&rebase=on"
+        self.link = "https://zdf-hls-01.akamaized.net/hls/live/2002460/de/ea2c86283bee25eee11b3b449370a64c/2/2.m3u8"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
@@ -354,12 +381,12 @@ class MainWindow(QMainWindow):
         self.mediaPlayer.play()
 
     def play_Info(self):
-        self.link = "http://zdf1112-lh.akamaihd.net/i/de12_v1@392882/index_776_av-p.m3u8?sd=10&rebase=on"
+        self.link = "https://zdfhls17-i.akamaihd.net/hls/live/744750/de/2/2.m3u8"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Phoenix(self):
-        self.link = "https://zdf0910-lh.akamaihd.net/i/de09_v1@392871/index_750_av-p.m3u8?sd=10&rebase=on"
+        self.link = "https://zdfhls19-i.akamaihd.net/hls/live/744752-b/de/2/2.m3u8"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
@@ -385,7 +412,7 @@ class MainWindow(QMainWindow):
     def playTV(self):
         action = self.sender()
 #        channel = self.sender().parent()
-        self.link = action.text()
+        self.link = action.data()
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 #        self.setWindowTitle(channel)
@@ -489,4 +516,3 @@ if __name__ == '__main__':
     mainWin = MainWindow()
     mainWin.show()
     sys.exit(app.exec_())
-
