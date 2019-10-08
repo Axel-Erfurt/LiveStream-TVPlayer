@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 #############################################################################
 
-from PyQt5.QtCore import (QPoint, QRect, Qt, QUrl, QProcess, QFile, QDir, QTimer, QSize, QStandardPaths, QFileInfo, QCoreApplication)
+from PyQt5.QtCore import (QPoint, QRect, Qt, QUrl, QProcess, QFile, QDir, QTimer, QSize, 
+                                                    QStandardPaths, QFileInfo, QCoreApplication)
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import (QAction, QApplication, QMainWindow, QMessageBox, 
                                                     QMenu, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, 
@@ -87,7 +88,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("TV Player & Recorder")
         self.setWindowIcon(QIcon.fromTheme("multimedia-video-player"))
 
-        self.myinfo = "TV-Player\n©2018\nAxel Schneider\n\nq = Exit\nf = toggle Fullscreen\n"
+        self.myinfo = "<h2>TV-Player</h2>©2018<br>Axel Schneider<h3>Shortcuts:</h3>q = Exit<br>f = toggle Fullscreen<br>u = play url from clipboard<br>h = toggle mouse cursor visible<br>r = record with timer<br>w = record without timer<br>s = stop recording"
         print("Welcome to TV Player & Recorder")
         if self.is_tool("streamlink"):
             print("found streamlink\nrecording enabled")
@@ -332,8 +333,10 @@ class MainWindow(QMainWindow):
         self.urlList.sort()
 
     def contextMenuRequested(self, point):
+        self.channels_menu.clear()
+        self.channels_menu.addMenu(self.c_menu)
         if not self.recording_enabled == False:
-            self.channels_menu.addSeparator()
+            self.channels_menu.addSection("Recording")
     
             tv_record = QAction(QIcon.fromTheme("media-record"), "record (r)", triggered = self.recordNow)
             self.channels_menu.addAction(tv_record)
@@ -348,7 +351,7 @@ class MainWindow(QMainWindow):
 
         self.channels_menu.addSeparator()
 
-        about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout)
+        about_action = QAction(QIcon.fromTheme("help-about"), "Info (i)", triggered = self.handleAbout, shortcut = "i")
         self.channels_menu.addAction(about_action)
 
         self.channels_menu.addSeparator()
@@ -356,10 +359,12 @@ class MainWindow(QMainWindow):
         url_action = QAction(QIcon.fromTheme(mybrowser), "play URL from clipboard (u)", triggered = self.playURL)
         self.channels_menu.addAction(url_action)
 
-        self.channels_menu.addSeparator()
+        self.channels_menu.addSection("Settings")
 
         color_action = QAction(QIcon.fromTheme("preferences-color"), "Color Options (c)", triggered = self.showColorDialog)
         self.channels_menu.addAction(color_action)
+
+        self.channels_menu.addSeparator()
 
         quit_action = QAction(QIcon.fromTheme("application-exit"), "Quit (q)", triggered = self.handleQuit)
         self.channels_menu.addAction(quit_action)
