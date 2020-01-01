@@ -2,23 +2,24 @@
 # -*- coding: utf-8 -*-
 #############################################################################
 
-from PyQt5.QtCore import (QPoint, QRect, Qt, QUrl, QProcess, QFile, QDir, QTimer, QSize, 
+from PyQt5.QtCore import (QPoint, QRect, Qt, QUrl, QProcess, QFile, QDir, QTimer, QSize, QEvent, 
                                                     QStandardPaths, QFileInfo, QCoreApplication)
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QAction, QApplication, QMainWindow, QMessageBox, 
                                                     QMenu, QWidget, QInputDialog, QLineEdit, QFileDialog, QLabel, 
                                                     QFormLayout, QSlider, QPushButton, QDialog)
-from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer, QMediaMetaData
+from PyQt5.QtMultimedia import QMediaContent, QMediaPlayer
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 
-import m3u8
 import os
 from time import sleep
 import subprocess
 import sys
+from requests import get as getURL
 
 mytv = "tv-symbolic"
 mybrowser = "video-television"
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -42,14 +43,13 @@ class MainWindow(QMainWindow):
         self.process.finished.connect(self.timer_finished)
         self.process.finished.connect(self.recfinished)
 
-
-        self.resolutions = ["480", "640", "852",  "960", "1280"]
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
         self.mediaPlayer.setVolume(100)
         self.mediaPlayer.error.connect(self.handleError)
         self.setAcceptDrops(True)
 
         self.videoWidget = QVideoWidget(self)
+        self.videoWidget.setAcceptDrops(True)
         self.videoWidget.setAspectRatioMode(1)
         self.videoWidget.setContextMenuPolicy(Qt.CustomContextMenu);
         self.videoWidget.customContextMenuRequested[QPoint].connect(self.contextMenuRequested)
@@ -57,11 +57,9 @@ class MainWindow(QMainWindow):
         self.mediaPlayer.setVideoOutput(self.videoWidget)
 
         self.lbl = QLabel(self.videoWidget)
-        self.lbl.setGeometry(10,10, 16, 16)
-        self.lbl.setAlignment(Qt.AlignCenter)
-        self.lbl.setStyleSheet("background-color: red;")
-        pixmap = QPixmap(QIcon.fromTheme("/home/brian/Dokumente/python_files/def_icons/16x16/actions/media-record.png").pixmap(QSize(16, 16)))
-        self.lbl.setPixmap(pixmap)
+        self.lbl.setGeometry(10,10, 60, 16)
+        self.lbl.setStyleSheet("background: red; color: #eeeeec; font-size: 7pt;")
+        self.lbl.setText("recording ...")
         self.lbl.hide()
 
         self.root = QFileInfo.path(QFileInfo(QCoreApplication.arguments()[0]))
@@ -98,37 +96,68 @@ class MainWindow(QMainWindow):
         self.getLists()
         self.makeMenu()
         self.play_ARD()
+        
+    def getMenu(self):
+        chFolder = self.root + "/tv_listen/"
+        pList = [f for f in os.listdir(chFolder) if os.path.isfile(os.path.join(chFolder, f))]
+        menuList = []
+        
+        for x in range(len(pList)):
+            ft = f"{chFolder}{pList[x]}"
+            name = os.path.splitext(os.path.basename(ft))[0]
+            text = open(ft, 'r').read()
+            
+            mlist = text.splitlines()
+            for x in range(len(mlist)):
+                if "RESOLUTION=640" in mlist[x]:
+                    menuList.append(f"{name.upper()},{mlist[x+1]}")
+                    if name.upper() == "ARD":
+                        self.myARD = (f"{name.upper()},{mlist[x+1]}")
+                    if name.upper() == "ZDF":
+                        self.myZDF = (f"{name.upper()},{mlist[x+1]}")
+                    if name.upper() == "MDR THÜRINGEN":
+                        self.myMDR = (f"{name.upper()},{mlist[x+1]}")
+                    if name.upper() == "PHOENIX":
+                        self.myPhoenix = (f"{name.upper()},{mlist[x+1]}")
+                    if name.upper() == "ZDF INFO":
+                        self.myZDFInfo = (f"{name.upper()},{mlist[x+1]}")
+                    break
+            for x in range(len(mlist)):
+                if "RESOLUTION=1280" in mlist[x]:
+                    menuList.append(f"{name.upper()} HD,{mlist[x+1]}")
+                    break
+                elif "RESOLUTION=852" in mlist[x]:
+                    menuList.append(f"{name.upper()} HD,{mlist[x+1]}")
+                    break
+        return menuList
+
 
     def makeMenu(self):
-        ## menu ##
-        for url in self.urlList:
-            res = ""
-            kanal = url.rpartition(".")[0].rpartition("/")[2].upper()
-            m = self.c_menu.addMenu(QIcon.fromTheme("video-display"),kanal)
-            m.setObjectName(kanal)
-            self.menulist.append(kanal)
-            variant_m3u8 = m3u8.load(url)
-            variant_m3u8.is_variant
-
-            for playlist in variant_m3u8.playlists:
-                if not playlist.stream_info.resolution == None:
-                    res = str(playlist.stream_info.resolution[0])
-                    if res in self.resolutions:
-                        a = QAction(res + "p", self, triggered=self.playTV)
-                        a.setIcon(QIcon.fromTheme(mybrowser))
-                        a.setData(playlist.uri)
-                        rm = m.addAction(a)
+        pList = self.getMenu()
+        pList.sort(key=lambda x:x.upper()[:5])
+        hdm = self.c_menu.addMenu(QIcon.fromTheme("computer"), "HD")
+        for playlist in pList:
+            name = playlist.partition(",")[0]
+            url = playlist.partition(",")[2]
+            if not "HD" in name:
+                a = QAction(name, self, triggered=self.playTV)
+                a.setIcon(QIcon.fromTheme(mybrowser))
+                a.setData(url)
+                rm = self.c_menu.addAction(a)
+            else:
+                a = QAction(name, self, triggered=self.playTV)
+                a.setIcon(QIcon.fromTheme(mybrowser))
+                a.setData(url)
+                rm = hdm.addAction(a)
 
         a = QAction(QIcon.fromTheme(mybrowser), "Sport1 Live", self, triggered=self.play_Sport1)
         self.c_menu.addAction(a)
-        ### end menu
     
     def dragEnterEvent(self, event):
         if (event.mimeData().hasUrls()):
             event.acceptProposedAction()
 
     def dropEvent(self, event):
-        print("drop")
         if event.mimeData().hasUrls():
             url = event.mimeData().urls()[0].toString()
             print("url = ", url)
@@ -137,10 +166,12 @@ class MainWindow(QMainWindow):
             self.mediaPlayer.play()
         elif event.mimeData().hasText():
             mydrop =  event.mimeData().text()
-            print("generic url = ", mydrop)
-            self.mediaPlayer.setMedia(QMediaContent(QUrl(mydrop)))
-            self.mediaPlayer.play()
-            self.hideSlider()
+            if "http" in mydrop:
+                print("generic url = ", mydrop)
+                self.mediaPlayer.setMedia(QMediaContent(QUrl(mydrop)))
+                self.mediaPlayer.play()
+        event.acceptProposedAction()
+        
 
     def recfinished(self):
         print("recording finished 1")
@@ -190,20 +221,23 @@ class MainWindow(QMainWindow):
     def recordChannel(self):
         cmd =  'timeout ' + str(self.tout) + ' streamlink --force ' + self.link.replace("?sd=10&rebase=on", "") + ' best -o ' + self.outfile
         print(cmd)
-        print("recording to /tmp with tiimeout: " + str(self.tout))
+        print("recording to /tmp with timeout: " + str(self.tout))
         self.lbl.update()
         self.is_recording = True
         self.process.start(cmd)
 ################################################################
 
     def saveMovie(self):
-        self.msgbox("recording finished")
+        #self.msgbox("recording finished")
         self.fileSave()
 
     def fileSave(self):
         infile = QFile(self.outfile)
-        path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/TVRecording.mp4",
-            "Video (*.mp4)")
+        #path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/TVRecording.mp4",
+        #    "Video (*.mp4)")
+        path = QDir.homePath() + "/Videos/TVRecording.mp4"
+        if os.path.exists(path):
+            os.remove(path)
         if (path != ""):
             savefile = path
             if QFile(savefile).exists:
@@ -215,6 +249,8 @@ class MainWindow(QMainWindow):
             if infile.exists:
                 infile.remove()
         self.lbl.hide()
+        self.showMinimized()
+        #os.system('shutdown -h 1') 
 
     def stop_recording(self):
         print(self.process.state())
@@ -268,7 +304,7 @@ class MainWindow(QMainWindow):
             print("no Fullscreen")
         else:
             self.rect = self.geometry()
-            self.showFullScreen()
+            self.showMaximized()
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.fullscreen = True
             print("Fullscreen entered")
@@ -372,56 +408,48 @@ class MainWindow(QMainWindow):
         self.channels_menu.exec_(self.mapToGlobal(point))
 
     def play_ARD(self):
-        self.link = "https://derste247livede.akamaized.net/hls/live/658317/daserste_de/master_1184.m3u8"
+        self.link = self.myARD.partition(",")[2]
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_ZDF(self):
-        self.link = "https://zdf-hls-01.akamaized.net/hls/live/2002460/de/ea2c86283bee25eee11b3b449370a64c/2/2.m3u8"
+        self.link = self.myZDF.partition(",")[2]
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_MDR(self):
-        self.link = "http://mdrthuhls-lh.akamaihd.net/i/livetvmdrthueringen_de@514027/index_1216_av-p.m3u8?sd=10&rebase=on"
+        self.link = self.myMDR.partition(",")[2]
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Info(self):
-        self.link = "https://zdfhls17-i.akamaihd.net/hls/live/744750/de/2/2.m3u8"
+        self.link = self.myZDFInfo.partition(",")[2]
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Phoenix(self):
-        self.link = "https://zdfhls19-i.akamaihd.net/hls/live/744752-b/de/2/2.m3u8"
+        self.link = self.myPhoenix.partition(",")[2]
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Sport1(self):
-        if not QStandardPaths.findExecutable("youtube-dl") == "":
-            cmd = "youtube-dl -g https://tv.sport1.de/sport1/"
-            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True, shell=True)
-            (link, err) = proc.communicate()
-            print(link)
-            myurl = str(link).partition('\n')[0] #.partition("b'")[2].replace("\n", "")
-            if not myurl =="":
-                self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
-                self.link = myurl
-                self.mediaPlayer.play()
-            else:
-                msg = QMessageBox.about(self, "TVLive", "URL not found")
-        else:
-                msg = QMessageBox.about(self, "TVLive", "youtube-dl not found")
+        url = "https://tv.sport1.de/sport1/"
+        r = getURL(url)
+        myurl = r.text.partition('file: "')[2].partition('"')[0]
+        print("grabbed url Sport1:", myurl)
+        if not myurl =="":
+            self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
+            self.link = myurl
+            self.mediaPlayer.play()
 
     def showLabel(self):
         self.lbl.show()
 
     def playTV(self):
         action = self.sender()
-#        channel = self.sender().parent()
         self.link = action.data()
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
-#        self.setWindowTitle(channel)
 
     def closeEvent(self, event):
         event.accept()
