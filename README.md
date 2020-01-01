@@ -4,12 +4,9 @@ __Requirements:__
 
 - [python3](https://www.python.org/)
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/download5)
-- [m3u8](https://github.com/globocom/m3u8)
 - [streamlink](https://github.com/streamlink/streamlink) for recording TV
 
 made and testet in Linux
-
-[Download Linux 64bit App](https://www.dropbox.com/s/vndl5ttqxpr6em4/TVPlayer2.tar.gz?dl=1)
 
 place your m3u8 files inside the tv_listen folder
 (create a tv_listen folder in the folder where TVPlayer2.py is located)
