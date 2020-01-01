@@ -233,9 +233,9 @@ class MainWindow(QMainWindow):
 
     def fileSave(self):
         infile = QFile(self.outfile)
-        #path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/TVRecording.mp4",
-        #    "Video (*.mp4)")
-        path = QDir.homePath() + "/Videos/TVRecording.mp4"
+        path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/TVRecording.mp4",
+            "Video (*.mp4)")
+        #path = QDir.homePath() + "/Videos/TVRecording.mp4"
         if os.path.exists(path):
             os.remove(path)
         if (path != ""):
