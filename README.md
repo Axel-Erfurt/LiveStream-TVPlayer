@@ -9,13 +9,6 @@ __Requirements:__
 made and testet in Linux
 
 place your m3u8 files inside the tv_listen folder
-(create a tv_listen folder in the folder where TVPlayer2.py is located)
-
-it reads the m3u8 files and creates a contextmenu (named from file) with the resolutions (as submenu) defined in
-
-    self.resolutions = ["320", "480", "640", "960", "1280"]
-
-(you can add more if you want)
 
 m3u8 should look like this:
 
