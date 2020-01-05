@@ -35,3 +35,6 @@ starting with
 uninstall with
 
 > cd ~/.local/share/ && rm -rf LiveStream-TVPlayer-master
+
+
+[Download 64bit App Ubuntu/Mint](https://mega.nz/#!mTgAlYpZ!OyNa_2tsWq8emOcZNFWO8gI0e6nAco7bty4-aSB7toU)
