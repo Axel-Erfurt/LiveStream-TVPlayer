@@ -10,6 +10,19 @@ made and testet in Linux
 
 place your m3u8 files inside the tv_listen folder
 
+### Shortcuts:
+- q = Exit
+- f = toggle Fullscreen
+- u = play url from clipboard
+- mouse wheel = resize window
+- mouse click left + move = move window
+- arrow up = more volume
+- arrow down = less volume
+- h = toggle mouse cursor visible
+- r = record with timer
+- w = record without timer
+- s = stop recording
+
 m3u8 should look like this:
 
     #EXTM3U
