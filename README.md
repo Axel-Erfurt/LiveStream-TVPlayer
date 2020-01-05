@@ -19,25 +19,12 @@ m3u8 should look like this:
     http://daserstehdde-lh.akamaihd.net/i/daserstehd_de@629196/index_3776_av-b.m3u8?sd=10&rebase=on
 
 
-[Ubuntu / Mint Installer](https://www.dropbox.com/s/zyvt4jgngxbli58/TVPlayerInstall.sh?dl=1)
+### Ubuntu / Mint Installation
 
-Save the file in the Downloads folder.
-
-then in the terminal
+copy TVPlayerInstall.sh to ~/Downloads
+open Terminal
 
 > cd ~/Downloads && chmod +x ./TVPlayerInstall.sh && ./TVPlayerInstall.sh
-
-make mediaterm executable (once)
-
-> chmod +x ~/.local/share/LiveStream-TVPlayer-master/mediaterm
-
-starting with
-
-> cd ~/.local/share/LiveStream-TVPlayer-master && python3 ./TVPlayer2.py
-
-to update channels 
-
-> python3 ~/.local/share/LiveStream-TVPlayer-master/Sender_aktualisieren.py
 
 
 uninstall with
