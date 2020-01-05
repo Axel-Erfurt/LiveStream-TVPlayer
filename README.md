@@ -27,10 +27,18 @@ then in the terminal
 
 > cd ~/Downloads && chmod +x ./TVPlayerInstall.sh && ./TVPlayerInstall.sh
 
+make mediaterm executable (once)
+
+> chmod +x ~/.local/share/LiveStream-TVPlayer-master/mediaterm
 
 starting with
 
 > cd ~/.local/share/LiveStream-TVPlayer-master && python3 ./TVPlayer2.py
+
+to update channels 
+
+> python3 ~/.local/share/LiveStream-TVPlayer-master/Sender_aktualisieren.py
+
 
 uninstall with
 
