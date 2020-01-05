@@ -93,6 +93,9 @@ class MainWindow(QMainWindow):
                         <br>http://martikel.bplaced.net/skripte1/mediaterm.html\
                         <h3>Shortcuts:</h3>q = Exit<br>f = toggle Fullscreen<br>\
                         u = play url from clipboard<br>\
+                        mouse wheel = resize<br>\
+                        arrow up = more volume<br>\
+                        arrow down = less volume<br>\
                         h = toggle mouse cursor visible<br>\
                         r = record with timer<br>\
                         w = record without timer<br>s = stop recording"
@@ -259,8 +262,6 @@ class MainWindow(QMainWindow):
             if infile.exists:
                 infile.remove()
         self.lbl.hide()
-        self.showMinimized()
-        #os.system('shutdown -h 1') 
 
     def stop_recording(self):
         print(self.process.state())
