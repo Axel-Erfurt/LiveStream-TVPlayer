@@ -9,7 +9,8 @@ chString = ""
 chList = []
 urlList = []
 
-app = os.path.expanduser("~") + "/.local/share/LiveStream-TVPlayer-master/mediaterm"
+root = sys.argv[1]
+app = os.path.join(root, "mediaterm")
 cmd = Popen([app, "-now", "-l"], stdout=PIPE)
 cmd_out, cmd_err = cmd.communicate()
 
@@ -50,7 +51,8 @@ for x in range(len(urlList)):
     print("verfying", chList[x])
     text = repairLinks(urlList[x])
     
-    outfile = os.path.expanduser("~") + "/.local/share/LiveStream-TVPlayer-master/tv_listen/" + chList[x] + ".m3u8"
+    name = chList[x] + ".m3u8"
+    outfile = os.path.join(root, "tv_listen/", name)
     with open(outfile, 'w') as f:
         f.write('\n'.join(text))
     
