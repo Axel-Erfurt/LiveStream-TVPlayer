@@ -7,10 +7,7 @@ echo "TVPlayer entpacken"
 unzip -o master.zip
 echo "zip Datei wird entfernt"
 rm master.zip
-rm ~/.local/share/LiveStream-TVPlayer-master/tv_listen/*
 chmod +x ~/.local/share/LiveStream-TVPlayer-master/mediaterm
 python3 ~/.local/share/LiveStream-TVPlayer-master/Sender_aktualisieren.py ~/.local/share/LiveStream-TVPlayer-master
 echo "TVPlayer wird gestartet ..."
 python3 ~/.local/share/LiveStream-TVPlayer-master/TVPlayer2.py
-exit
-
