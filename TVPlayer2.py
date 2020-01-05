@@ -34,6 +34,7 @@ class MainWindow(QMainWindow):
         self.timeout = "60"
         self.tout = 60
         self.outfile = "/tmp/TV.mp4"
+        self.myARD = ""
 
         self.channels_menu = QMenu()
         self.c_menu = self.channels_menu.addMenu(QIcon.fromTheme(mytv), "Channels")
@@ -103,7 +104,8 @@ class MainWindow(QMainWindow):
             self.msgbox("streamlink not found\nNo recording available")
         self.getLists()
         self.makeMenu()
-        self.play_ARD()
+        if not self.myARD == "":
+            self.play_ARD()
         
     def getMenu(self):
         chFolder = self.root + "/tv_listen/"
