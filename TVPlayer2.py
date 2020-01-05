@@ -44,7 +44,8 @@ class MainWindow(QMainWindow):
         self.process.finished.connect(self.recfinished)
 
         self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.StreamPlayback)
-        self.mediaPlayer.setVolume(100)
+        self.mediaPlayer.setVolume(90)
+        print("Volume:", self.mediaPlayer.volume())
         self.mediaPlayer.error.connect(self.handleError)
         self.setAcceptDrops(True)
 
@@ -86,7 +87,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("TV Player & Recorder")
         self.setWindowIcon(QIcon.fromTheme("multimedia-video-player"))
 
-        self.myinfo = "<h2>TV-Player</h2>©2018<br>Axel Schneider<h3>Shortcuts:</h3>q = Exit<br>f = toggle Fullscreen<br>u = play url from clipboard<br>h = toggle mouse cursor visible<br>r = record with timer<br>w = record without timer<br>s = stop recording"
+        self.myinfo = "<h2>TV-Player</h2>©2018<br><b>Axel Schneider</b>\
+                        <br><br>mediaterm by <b>Martin O'Connor</b>\
+                        <br>http://martikel.bplaced.net/skripte1/mediaterm.html\
+                        <h3>Shortcuts:</h3>q = Exit<br>f = toggle Fullscreen<br>\
+                        u = play url from clipboard<br>\
+                        h = toggle mouse cursor visible<br>\
+                        r = record with timer<br>\
+                        w = record without timer<br>s = stop recording"
         print("Welcome to TV Player & Recorder")
         if self.is_tool("streamlink"):
             print("found streamlink\nrecording enabled")
@@ -315,6 +323,7 @@ class MainWindow(QMainWindow):
         self.handleCursor()
 
     def handleCursor(self):
+        print("handle mouse cursor")
         if  QApplication.overrideCursor() ==  Qt.ArrowCursor:
             QApplication.setOverrideCursor(Qt.BlankCursor)
         else:
@@ -358,6 +367,14 @@ class MainWindow(QMainWindow):
             self.play_Sport1()
         elif e.key() == Qt.Key_Z:
             self.play_Info()
+        elif e.key() == Qt.Key_Up:
+            if self.mediaPlayer.volume() < 100:
+                self.mediaPlayer.setVolume(self.mediaPlayer.volume() + 5)
+                print("Volume:", self.mediaPlayer.volume())
+        elif e.key() == Qt.Key_Down:
+            if self.mediaPlayer.volume() > 5:
+                self.mediaPlayer.setVolume(self.mediaPlayer.volume() - 5)
+                print("Volume:", self.mediaPlayer.volume())
         else:
             e.accept()
 
@@ -401,11 +418,24 @@ class MainWindow(QMainWindow):
         self.channels_menu.addAction(color_action)
 
         self.channels_menu.addSeparator()
+        
+        self.updateAction = QAction(QIcon.fromTheme("download"), "update German Channels", triggered = self.updateChannels)
+        self.channels_menu.addAction(self.updateAction)
+        
+        self.channels_menu.addSeparator()
 
         quit_action = QAction(QIcon.fromTheme("application-exit"), "Quit (q)", triggered = self.handleQuit)
         self.channels_menu.addAction(quit_action)
 
         self.channels_menu.exec_(self.mapToGlobal(point))
+        
+    def updateChannels(self):
+        update_app = os.path.join(self.root, "mediaterm")
+        update_script = os.path.join(self.root, "Sender_aktualisieren.py")
+        if os.path.isfile(update_app) and os.path.isfile(update_script):
+            print("starting", update_script)
+            subprocess.call(["python3", update_script, self.root])
+            self.msgbox("please restart application")
 
     def play_ARD(self):
         self.link = self.myARD.partition(",")[2]
