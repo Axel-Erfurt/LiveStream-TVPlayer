@@ -19,7 +19,7 @@ from requests import get as getURL
 
 mytv = "tv-symbolic"
 mybrowser = "video-television"
-
+ratio = 1.777777778
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.tout = 60
         self.outfile = "/tmp/TV.mp4"
         self.myARD = ""
+        self.channelname = ""
 
         self.channels_menu = QMenu()
         self.c_menu = self.channels_menu.addMenu(QIcon.fromTheme(mytv), "Channels")
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)
 
         self.videoWidget = QVideoWidget(self)
+        self.videoWidget.setStyleSheet("background: black;")
         self.videoWidget.setAcceptDrops(True)
         self.videoWidget.setAspectRatioMode(1)
         self.videoWidget.setContextMenuPolicy(Qt.CustomContextMenu);
@@ -59,19 +61,20 @@ class MainWindow(QMainWindow):
         self.mediaPlayer.setVideoOutput(self.videoWidget)
 
         self.lbl = QLabel(self.videoWidget)
-        self.lbl.setGeometry(10,10, 60, 16)
-        self.lbl.setStyleSheet("background: red; color: #eeeeec; font-size: 7pt;")
+        self.lbl.setGeometry(10,10, 70, 16)
+        self.lbl.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.lbl.setStyleSheet("background: #2e3436; color: #ef2929; font-size: 8pt;")
         self.lbl.setText("recording ...")
         self.lbl.hide()
 
         self.root = QFileInfo.path(QFileInfo(QCoreApplication.arguments()[0]))
-        print("root is: " + self.root)
+        print("app folder is: " + self.root)
 
         self.fullscreen = False
 
         self.setAttribute(Qt.WA_NoSystemBackground, True)
         self.setMinimumSize(320, 180)
-        self.setGeometry(0, 0, 480, 480 / 1.778)
+        self.setGeometry(0, 0, 480, 480 / ratio)
 
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         screen = QApplication.primaryScreen()
@@ -88,14 +91,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("TV Player & Recorder")
         self.setWindowIcon(QIcon.fromTheme("multimedia-video-player"))
 
-        self.myinfo = "<h2>TV-Player</h2>©2018<br><b>Axel Schneider</b>\
-                        <br><br>mediaterm by <b>Martin O'Connor</b>\
-                        <br>http://martikel.bplaced.net/skripte1/mediaterm.html\
+        self.myinfo = "<h1>TVPlayer2</h1>©2018<br><a href='https://goodoldsongs.jimdofree.com/'>Axel Schneider</a>\
+                        <br><br>mediaterm by <a href='http://martikel.bplaced.net/skripte1/mediaterm.html'>Martin O'Connor</a>\
                         <h3>Shortcuts:</h3>q = Exit<br>f = toggle Fullscreen<br>\
                         u = play url from clipboard<br>\
                         mouse wheel = resize<br>\
                         arrow up = more volume<br>\
                         arrow down = less volume<br>\
+                        m = toggle mute<br>\
                         h = toggle mouse cursor visible<br>\
                         r = record with timer<br>\
                         w = record without timer<br>s = stop recording"
@@ -142,12 +145,12 @@ class MainWindow(QMainWindow):
                 elif "RESOLUTION=852" in mlist[x]:
                     menuList.append(f"{name.upper()} HD,{mlist[x+1]}")
                     break
+        menuList.sort(key=lambda x:x.partition(",")[0].upper()[:5])
         return menuList
 
 
     def makeMenu(self):
         pList = self.getMenu()
-        pList.sort(key=lambda x:x.upper()[:5])
         hdm = self.c_menu.addMenu(QIcon.fromTheme("computer"), "HD")
         for playlist in pList:
             name = playlist.partition(",")[0]
@@ -221,7 +224,7 @@ class MainWindow(QMainWindow):
                 QFile(self.outfile).remove
             else:
                 print("The file " + self.outfile + " does not exist") 
-            self.showLabel()
+            #self.showLabel()
             dlg = QInputDialog()
             tout, ok = dlg.getText(self, 'insert timeout', "recording to /tmp/TV.mp4\n\nExample:\n60s (60 seconds)\n120m (120 minutes)", QLineEdit.Normal, "90m", Qt.Dialog)
             if ok:
@@ -232,6 +235,7 @@ class MainWindow(QMainWindow):
                 print("recording cancelled")
 
     def recordChannel(self):
+        self.showLabel()
         cmd =  'timeout ' + str(self.tout) + ' streamlink --force ' + self.link.replace("?sd=10&rebase=on", "") + ' best -o ' + self.outfile
         print(cmd)
         print("recording to /tmp with timeout: " + str(self.tout))
@@ -246,7 +250,7 @@ class MainWindow(QMainWindow):
 
     def fileSave(self):
         infile = QFile(self.outfile)
-        path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/TVRecording.mp4",
+        path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/" + self.channelname + ".mp4",
             "Video (*.mp4)")
         #path = QDir.homePath() + "/Videos/TVRecording.mp4"
         if os.path.exists(path):
@@ -261,7 +265,9 @@ class MainWindow(QMainWindow):
                     "Cannot write file %s:\n%s." % (path, infile.errorString()))
             if infile.exists:
                 infile.remove()
-        self.lbl.hide()
+            self.lbl.hide()
+        else:
+            self.lbl.hide()
 
     def stop_recording(self):
         print(self.process.state())
@@ -274,6 +280,7 @@ class MainWindow(QMainWindow):
                 self.saveMovie()
         else:
             print("no recording process running")
+            self.lbl.hide()
  
     def rec_finished(self):
         print("rec_finished")
@@ -292,7 +299,10 @@ class MainWindow(QMainWindow):
     def playURL(self):
         clip = QApplication.clipboard()
         self.link = clip.text()
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
+        if not self.link.startswith("http"):
+            self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(self.link)))
+        else:
+            self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def handleError(self):
@@ -441,36 +451,48 @@ class MainWindow(QMainWindow):
             self.msgbox("please restart application")
 
     def play_ARD(self):
+        self.lbl.hide()
         self.link = self.myARD.partition(",")[2]
+        self.channelname = "ARD"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_ZDF(self):
+        self.lbl.hide()
         self.link = self.myZDF.partition(",")[2]
+        self.channelname = "ZDF"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_MDR(self):
+        self.lbl.hide()
         self.link = self.myMDR.partition(",")[2]
+        self.channelname = "MDR"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Info(self):
+        self.lbl.hide()
         self.link = self.myZDFInfo.partition(",")[2]
+        self.channelname = "ZDF Info"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Phoenix(self):
+        self.lbl.hide()
         self.link = self.myPhoenix.partition(",")[2]
+        self.channelname = "Phoenix"
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def play_Sport1(self):
+        self.lbl.hide()
         url = "https://tv.sport1.de/sport1/"
         r = getURL(url)
         myurl = r.text.partition('file: "')[2].partition('"')[0]
         print("grabbed url Sport1:", myurl)
         if not myurl =="":
+            self.channelname = "Sport1"
             self.mediaPlayer.setMedia(QMediaContent(QUrl(myurl)))
             self.link = myurl
             self.mediaPlayer.play()
@@ -479,8 +501,11 @@ class MainWindow(QMainWindow):
         self.lbl.show()
 
     def playTV(self):
+        self.lbl.hide()
         action = self.sender()
         self.link = action.data()
+        self.channelname = action.text()
+        print("playing", self.channelname)
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
@@ -494,10 +519,9 @@ class MainWindow(QMainWindow):
         QMessageBox.warning(self, "Message", message)
 
     def wheelEvent(self, event):
-#        return
         mwidth = self.frameGeometry().width()
         mheight = self.frameGeometry().height()
-        ratio = 1.778
+        #ratio = 1.777777778
         mleft = self.frameGeometry().left()
         mtop = self.frameGeometry().top()
         mscale = event.angleDelta().y() / 6
