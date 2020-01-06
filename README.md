@@ -37,11 +37,13 @@ m3u8 should look like this:
 
 ### Ubuntu / Mint Installation
 
-copy TVPlayerInstall.sh to ~/Downloads
 open Terminal
 
-> cd ~/Downloads && chmod +x ./TVPlayerInstall.sh && ./TVPlayerInstall.sh
+> wget 'https://raw.githubusercontent.com/Axel-Erfurt/LiveStream-TVPlayer/master/TVPlayerInstall.sh' -O ~/Downloads/TVPlayerInstall.sh && chmod +x ~/Downloads/TVPlayerInstall.sh && ~/Downloads/TVPlayerInstall.sh 
 
+start app with
+
+> cd ~/.local/share/LiveStream-TVPlayer-master && python3 ./TVPlayer2.py 
 
 uninstall with
 
