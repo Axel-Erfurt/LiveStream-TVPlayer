@@ -45,6 +45,8 @@ start app with
 
 > cd ~/.local/share/LiveStream-TVPlayer-master && python3 ./TVPlayer2.py 
 
+or use TVPlayer2 in start menu
+
 uninstall with
 
 > cd ~/.local/share/ && rm -rf LiveStream-TVPlayer-master
