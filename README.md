@@ -7,6 +7,7 @@ __Requirements:__
 - [streamlink](https://github.com/streamlink/streamlink) for recording TV
 
 __Credits:__
+
 [mediaterm by Martin O'Connor](http://martikel.bplaced.net/skripte1/mediaterm.html)
 
 made and testet in Linux
