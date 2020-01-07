@@ -6,11 +6,14 @@ __Requirements:__
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/download5)
 - [streamlink](https://github.com/streamlink/streamlink) for recording TV
 
+__Credits:__
+[mediaterm by Martin O'Connor](http://martikel.bplaced.net/skripte1/mediaterm.html)
+
 made and testet in Linux
 
 place your m3u8 files inside the tv_listen folder
 
-### Shortcuts:
+__Shortcuts:__
 - q = Exit
 - f = toggle Fullscreen
 - u = play url from clipboard
@@ -35,7 +38,7 @@ m3u8 should look like this:
 ![screenshot](https://github.com/Axel-Erfurt/LiveStream-TVPlayer/blob/master/screenshot.png)
 
 
-### Ubuntu / Mint Installation
+__Ubuntu / Mint Installation__
 
 open Terminal
 
