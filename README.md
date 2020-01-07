@@ -58,7 +58,7 @@ uninstall with
 
 App made with pyinstaller - maybe it works or not
 
-[Download 64bit App Ubuntu/Mint](https://mega.nz/#!mTgAlYpZ!OyNa_2tsWq8emOcZNFWO8gI0e6nAco7bty4-aSB7toU)
+[Download 64bit App Ubuntu/Mint 🇬🇧](https://mega.nz/#!mTgAlYpZ!OyNa_2tsWq8emOcZNFWO8gI0e6nAco7bty4-aSB7toU)
 
 [Download 64bit App Ubuntu/Mint 🇩🇪](https://www.dropbox.com/s/mklr44bcu92kc1g/TVPlayer2_64_deutsch.tar.gz?dl=1)
 
