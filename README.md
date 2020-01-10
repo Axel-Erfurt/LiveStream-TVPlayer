@@ -1,5 +1,7 @@
 # TV LiveStream-Player & Recorder
 
+[deutsche Version hier-> 🇩🇪 ](https://github.com/Axel-Erfurt/LiveStream-TVPlayer-Deutsch)
+
 __Requirements:__
 
 - [python3](https://www.python.org/)
