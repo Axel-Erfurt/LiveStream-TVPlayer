@@ -8,11 +8,7 @@ __Requirements:__
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/download5)
 - [streamlink](https://github.com/streamlink/streamlink) for recording TV
 
-__Credits:__
-
-[mediaterm by Martin O'Connor](http://martikel.bplaced.net/skripte1/mediaterm.html)
-
-made and testet in Linux
+made and testet in Linux Mint 19
 
 place your m3u8 files inside the tv_listen folder
 
