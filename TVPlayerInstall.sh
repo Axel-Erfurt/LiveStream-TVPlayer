@@ -1,14 +1,11 @@
 #!/bin/sh
 cd ~/.local/share/
-echo "TVPlayer herunterladen ..."
+echo "downloading TVPlayer2 ..."
 wget https://github.com/Axel-Erfurt/LiveStream-TVPlayer/archive/master.zip
-echo "TVPlayer entpacken"
+echo "unzip TVPlayer"
 unzip -o master.zip
-echo "zip Datei wird entfernt"
+echo "remove zip file"
 rm master.zip
-chmod +x ~/.local/share/LiveStream-TVPlayer-master/mediaterm
 cp ~/.local/share/LiveStream-TVPlayer-master/TVPlayer2.desktop ~/.local/share/applications
-echo "Senderliste aktualisieren"
-python3 ~/.local/share/LiveStream-TVPlayer-master/Sender_aktualisieren.py ~/.local/share/LiveStream-TVPlayer-master
-echo "TVPlayer wird gestartet ..."
+echo "starting TVPlayer2 ..."
 python3 ~/.local/share/LiveStream-TVPlayer-master/TVPlayer2.py
