@@ -34,7 +34,6 @@ class MainWindow(QMainWindow):
         self.timeout = "60"
         self.tout = 60
         self.outfile = "/tmp/TV.mp4"
-        self.myARD = ""
         self.channelname = ""
 
         self.channels_menu = QMenu()
@@ -92,26 +91,24 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon.fromTheme("multimedia-video-player"))
 
         self.myinfo = "<h1>TVPlayer2</h1>©2018<br><a href='https://goodoldsongs.jimdofree.com/'>Axel Schneider</a>\
-                        <br><br>mediaterm by <a href='http://martikel.bplaced.net/skripte1/mediaterm.html'>Martin O'Connor</a>\
-                        <h3>Shortcuts:</h3>q = Exit<br>f = toggle Fullscreen<br>\
-                        u = play url from clipboard<br>\
-                        mouse wheel = resize<br>\
-                        arrow up = more volume<br>\
-                        arrow down = less volume<br>\
-                        m = toggle mute<br>\
-                        h = toggle mouse cursor visible<br>\
+                        <h3>Tastaturkürzel:</h3>q = exit<br>f = toggle Fullscreen<br>\
+                        u = play Url from clipboard<br>\
+                        mousewheel = resize<br>\
+                        ↑ = more volume<br>\
+                        ↓ = less volume<br>\
+                        m = Ton an/aus<br>\
+                        h = mouse pointer on / off<br>\
                         r = record with timer<br>\
                         w = record without timer<br>s = stop recording"
-        print("Welcome to TV Player & Recorder")
+        print("Welcome")
         if self.is_tool("streamlink"):
             print("found streamlink\nrecording enabled")
             self.recording_enabled = True
         else:
-            self.msgbox("streamlink not found\nNo recording available")
+            self.msgbox("streamlink not found\nno recording available")
         self.getLists()
         self.makeMenu()
-        if not self.myARD == "":
-            self.play_ARD()
+
         
     def getMenu(self):
         chFolder = self.root + "/tv_listen/"
@@ -127,16 +124,6 @@ class MainWindow(QMainWindow):
             for x in range(len(mlist)):
                 if "RESOLUTION=640" in mlist[x]:
                     menuList.append(f"{name.upper()},{mlist[x+1]}")
-                    if name.upper() == "ARD":
-                        self.myARD = (f"{name.upper()},{mlist[x+1]}")
-                    if name.upper() == "ZDF":
-                        self.myZDF = (f"{name.upper()},{mlist[x+1]}")
-                    if name.upper() == "MDR THÜRINGEN":
-                        self.myMDR = (f"{name.upper()},{mlist[x+1]}")
-                    if name.upper() == "PHOENIX":
-                        self.myPhoenix = (f"{name.upper()},{mlist[x+1]}")
-                    if name.upper() == "ZDF INFO":
-                        self.myZDFInfo = (f"{name.upper()},{mlist[x+1]}")
                     break
             for x in range(len(mlist)):
                 if "RESOLUTION=1280" in mlist[x]:
@@ -183,14 +170,14 @@ class MainWindow(QMainWindow):
         elif event.mimeData().hasText():
             mydrop =  event.mimeData().text()
             if "http" in mydrop:
-                print("generic url = ", mydrop)
+                print("stream url = ", mydrop)
                 self.mediaPlayer.setMedia(QMediaContent(QUrl(mydrop)))
                 self.mediaPlayer.play()
         event.acceptProposedAction()
         
 
     def recfinished(self):
-        print("recording finished 1")
+        print("Aufnahme beendet 1")
 
     def is_tool(self, name):
         tool = QStandardPaths.findExecutable(name)
@@ -209,7 +196,7 @@ class MainWindow(QMainWindow):
                 print("deleting file " + self.outfile) 
                 QFile(self.outfile).remove
             else:
-                print("The file " + self.outfile + " does not exist") 
+                print("the file " + self.outfile + " does not exist") 
             self.showLabel()
             print("recording to /tmp")
             self.is_recording = True
@@ -220,13 +207,17 @@ class MainWindow(QMainWindow):
     def recordNow(self):
         if not self.recording_enabled == False:
             if QFile(self.outfile).exists:
-                print("deleting file " + self.outfile) 
+                print("lösche Datei " + self.outfile) 
                 QFile(self.outfile).remove
             else:
-                print("The file " + self.outfile + " does not exist") 
+                print("the file " + self.outfile + " does not exist") 
             #self.showLabel()
+            infotext = '<i>temporary recording to: /tmp/TV.mp4</i> \
+                            <br><b><font color="#a40000";>save folder and file name will be asked after finish recording</font></b> \
+                            <br><br><b>Example:</b><br>60s (60 seconds)<br>120m (120 minutes)'
             dlg = QInputDialog()
-            tout, ok = dlg.getText(self, 'insert timeout', "recording to /tmp/TV.mp4\n\nExample:\n60s (60 seconds)\n120m (120 minutes)", QLineEdit.Normal, "90m", Qt.Dialog)
+            tout, ok = dlg.getText(self, 'Recording Length', infotext, \
+                                    QLineEdit.Normal, "90m", Qt.Dialog)
             if ok:
                 self.tout = str(tout)
                 self.recordChannel()
@@ -250,7 +241,7 @@ class MainWindow(QMainWindow):
 
     def fileSave(self):
         infile = QFile(self.outfile)
-        path, _ = QFileDialog.getSaveFileName(self, "Save as...", QDir.homePath() + "/Videos/" + self.channelname + ".mp4",
+        path, _ = QFileDialog.getSaveFileName(self, "Speichern als...", QDir.homePath() + "/Videos/" + self.channelname + ".mp4",
             "Video (*.mp4)")
         #path = QDir.homePath() + "/Videos/TVRecording.mp4"
         if os.path.exists(path):
@@ -261,8 +252,8 @@ class MainWindow(QMainWindow):
                 QFile(savefile).remove()
             print("saving " + savefile)
             if not infile.copy(savefile):
-                QMessageBox.warning(self, "Error",
-                    "Cannot write file %s:\n%s." % (path, infile.errorString()))
+                QMessageBox.warning(self, "Fehler",
+                    "cannot write file %s:\n%s." % (path, infile.errorString()))
             if infile.exists:
                 infile.remove()
             self.lbl.hide()
@@ -272,23 +263,22 @@ class MainWindow(QMainWindow):
     def stop_recording(self):
         print(self.process.state())
         if self.is_recording == True:
-            print("stop recording")
+            print("stopping recording ...")
             QProcess().execute("killall streamlink")
             self.process.kill()
             self.is_recording = False
             if self.process.exitStatus() == 0:
                 self.saveMovie()
         else:
-            print("no recording process running")
+            print("no recording task")
             self.lbl.hide()
  
     def rec_finished(self):
-        print("rec_finished")
+        print("recording finished")
         self.process.kill()
 #        self.timer_finished()
 
     def timer_finished(self):
-        print("timer_finished")
         self.is_recording = False
         self.process.kill()
         print("recording finished")
@@ -307,8 +297,8 @@ class MainWindow(QMainWindow):
 
     def handleError(self):
         if not str(self.mediaPlayer.errorString()) == "QWidget::paintEngine: Should no longer be called":
-            print("Error: " + self.mediaPlayer.errorString())
-            self.msgbox("Error: " + self.mediaPlayer.errorString())
+            print("Fehler: " + self.mediaPlayer.errorString())
+            self.msgbox("Fehler: " + self.mediaPlayer.errorString())
 
     def handleMute(self):
         if not self.mediaPlayer.isMuted():
@@ -317,7 +307,7 @@ class MainWindow(QMainWindow):
             self.mediaPlayer.setMuted(False)
 
     def handleAbout(self):
-        msg = QMessageBox.about(self, "QT5 Player", self.myinfo)
+        msg = QMessageBox.about(self, "TVPlayer2", self.myinfo)
 
     def handleFullscreen(self):
         if self.fullscreen == True:
@@ -328,7 +318,7 @@ class MainWindow(QMainWindow):
             self.showMaximized()
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             self.fullscreen = True
-            print("Fullscreen entered")
+            print("Fullscreen")
         if self.fullscreen == False:
             self.showNormal()
             self.setGeometry(self.rect)
@@ -336,7 +326,6 @@ class MainWindow(QMainWindow):
         self.handleCursor()
 
     def handleCursor(self):
-        print("handle mouse cursor")
         if  QApplication.overrideCursor() ==  Qt.ArrowCursor:
             QApplication.setOverrideCursor(Qt.BlankCursor)
         else:
@@ -368,16 +357,6 @@ class MainWindow(QMainWindow):
             self.recordNow2()
         elif e.key() == Qt.Key_C:
             self.showColorDialog()
-        elif e.key() == Qt.Key_1:
-            self.play_ARD()
-        elif e.key() == Qt.Key_2:
-            self.play_ZDF()
-        elif e.key() == Qt.Key_3:
-            self.play_MDR()
-        elif e.key() == Qt.Key_4:
-            self.play_Phoenix()
-        elif e.key() == Qt.Key_5:
-            self.play_Sport1()
         elif e.key() == Qt.Key_Z:
             self.play_Info()
         elif e.key() == Qt.Key_Up:
@@ -404,10 +383,10 @@ class MainWindow(QMainWindow):
         if not self.recording_enabled == False:
             self.channels_menu.addSection("Recording")
     
-            tv_record = QAction(QIcon.fromTheme("media-record"), "record (r)", triggered = self.recordNow)
+            tv_record = QAction(QIcon.fromTheme("media-record"), "record with timer (r)", triggered = self.recordNow)
             self.channels_menu.addAction(tv_record)
 
-            tv_record2 = QAction(QIcon.fromTheme("media-record"), "record without timer (w)", triggered = self.recordNow2)
+            tv_record2 = QAction(QIcon.fromTheme("media-record"), "record (w)", triggered = self.recordNow2)
             self.channels_menu.addAction(tv_record2)
 
             tv_record_stop = QAction(QIcon.fromTheme("media-playback-stop"), "stop recording (s)", triggered = self.stop_recording)
@@ -427,63 +406,15 @@ class MainWindow(QMainWindow):
 
         self.channels_menu.addSection("Settings")
 
-        color_action = QAction(QIcon.fromTheme("preferences-color"), "Color Options (c)", triggered = self.showColorDialog)
+        color_action = QAction(QIcon.fromTheme("preferences-color"), "Colors (c)", triggered = self.showColorDialog)
         self.channels_menu.addAction(color_action)
 
         self.channels_menu.addSeparator()
-        
-        self.updateAction = QAction(QIcon.fromTheme("download"), "update German Channels", triggered = self.updateChannels)
-        self.channels_menu.addAction(self.updateAction)
-        
-        self.channels_menu.addSeparator()
 
-        quit_action = QAction(QIcon.fromTheme("application-exit"), "Quit (q)", triggered = self.handleQuit)
+        quit_action = QAction(QIcon.fromTheme("application-exit"), "exit (q)", triggered = self.handleQuit)
         self.channels_menu.addAction(quit_action)
 
         self.channels_menu.exec_(self.mapToGlobal(point))
-        
-    def updateChannels(self):
-        update_app = os.path.join(self.root, "mediaterm")
-        update_script = os.path.join(self.root, "Sender_aktualisieren.py")
-        if os.path.isfile(update_app) and os.path.isfile(update_script):
-            print("starting", update_script)
-            subprocess.call(["python3", update_script, self.root])
-            self.msgbox("please restart application")
-
-    def play_ARD(self):
-        self.lbl.hide()
-        self.link = self.myARD.partition(",")[2]
-        self.channelname = "ARD"
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
-        self.mediaPlayer.play()
-
-    def play_ZDF(self):
-        self.lbl.hide()
-        self.link = self.myZDF.partition(",")[2]
-        self.channelname = "ZDF"
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
-        self.mediaPlayer.play()
-
-    def play_MDR(self):
-        self.lbl.hide()
-        self.link = self.myMDR.partition(",")[2]
-        self.channelname = "MDR"
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
-        self.mediaPlayer.play()
-
-    def play_Info(self):
-        self.lbl.hide()
-        self.link = self.myZDFInfo.partition(",")[2]
-        self.channelname = "ZDF Info"
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
-        self.mediaPlayer.play()
-
-    def play_Phoenix(self):
-        self.lbl.hide()
-        self.link = self.myPhoenix.partition(",")[2]
-        self.channelname = "Phoenix"
-        self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
-        self.mediaPlayer.play()
 
     def play_Sport1(self):
         self.lbl.hide()
@@ -505,15 +436,12 @@ class MainWindow(QMainWindow):
         action = self.sender()
         self.link = action.data()
         self.channelname = action.text()
-        print("playing", self.channelname)
+        print("channel:", self.channelname)
         self.mediaPlayer.setMedia(QMediaContent(QUrl(self.link)))
         self.mediaPlayer.play()
 
     def closeEvent(self, event):
         event.accept()
-
-    def createStatusBar(self):
-        self.statusBar().showMessage("Ready")
 
     def msgbox(self, message):
         QMessageBox.warning(self, "Message", message)
@@ -569,9 +497,9 @@ class MainWindow(QMainWindow):
             layout.addRow("Brightness", self.brightnessSlider)
             layout.addRow("Contrast", self.contrastSlider)
             layout.addRow("Hue", self.hueSlider)
-            layout.addRow("Saturation", self.saturationSlider)
+            layout.addRow("Color", self.saturationSlider)
 
-            btn = QPushButton("Reset Colors")
+            btn = QPushButton("Reset")
             btn.setIcon(QIcon.fromTheme("preferences-color"))
             layout.addRow(btn)
 
@@ -580,7 +508,7 @@ class MainWindow(QMainWindow):
             layout.addRow(button)
 
             self.colorDialog = QDialog(self)
-            self.colorDialog.setWindowTitle("Color Options")
+            self.colorDialog.setWindowTitle("Color Settings")
             self.colorDialog.setLayout(layout)
 
             btn.clicked.connect(self.resetColors)
