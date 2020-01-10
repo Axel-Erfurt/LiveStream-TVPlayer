@@ -1,0 +1,4 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-STREAM-INF:BANDWIDTH=2101574,CODECS="avc1.77.31,mp4a.40.2",RESOLUTION=1280x720
+https://orf2.mdn.ors.at/out/u/orf2/qxb/chunklist_w1104585173.m3u8
