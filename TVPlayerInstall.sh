@@ -25,7 +25,6 @@ unzip -o master.zip
 sleep 1
 echo "remove zip file"
 rm master.zip
-mv ~/.local/share/LiveStream-TVPlayer-Deutsch-master ~/.local/share/LiveStream-TVPlayer-master
 rf=/tmp/tv_listen
 if [ -d "$rf" ]
 then
