@@ -42,7 +42,5 @@ else
     cp $HOME/.local/share/LiveStream-TVPlayer-master/TVPlayer2.desktop $HOME/.local/share/applications
 fi
 rm ~/Downloads/TVPlayerInstall.sh
-echo "check Channels ... "
-python3 ~/.local/share/LiveStream-TVPlayer-master/query_mv.py ~/.local/share/LiveStream-TVPlayer-master/
 echo "starting TVPlayer2 ... "
 python3 ~/.local/share/LiveStream-TVPlayer-master/TVPlayer2.py
