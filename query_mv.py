@@ -37,7 +37,7 @@ def getURL(name):
             chList.append(title.replace(".", " ").replace(' Livestream', ''))
             urlList.append(url)
     
-### fehlend Links ersetzen
+### check missing links
 def repairLinks(url):
     if "master.m3u8" in url:
         base_url = url.rpartition("master.m3u8")[0]
@@ -57,10 +57,10 @@ def repairLinks(url):
 for x in range(len(channels)):
     r = getURL(channels[x])
     
-### alle überprüfen
+### check all
 for x in range(len(urlList)):
     #print(chList[x],urlList[x])
-    print("überprüfe", chList[x])
+    print("checking", chList[x])
     text = repairLinks(urlList[x])
     name = chList[x] + ".m3u8"
     outfile = os.path.join(root, "tv_listen/", name)
