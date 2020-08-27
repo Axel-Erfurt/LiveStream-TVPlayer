@@ -1,0 +1,23 @@
+DW English,http://dwstream1-lh.akamaihd.net/i/dwstream1_live@120422/index_1_av-p.m3u8?sd=10&rebase=on
+RTV GO!,http://59132e529e3d1.streamlock.net/Groningen1/Groningen1/playlist.m3u8
+Canal C,http://streamer.canalc.be:1935/canalc/smil:SMIL-canalc-multi/chunklist.m3u8
+Grand Lille TV,http://live.creacast.com/grandlilletv/smil:grandlilletv.smil/playlist.m3u8
+Canale 10,http://37.187.142.147:1935/ch10live/high.stream/live.m3u8
+RAI 1,http://ott-cdn.ucom.am/s29/04.m3u8
+Kanal 10 Sverige,http://cdn-kanal10.crossnet.net/kanal10/ngrp:kanal10sverige_all/playlist.m3u8
+TV Visjon Norge,http://cdn-flash.crossnet.net/visjonnorgelive/ngrp:tvvn_all/chunklist.m3u8
+Folketinget,http://cdnapisec.kaltura.com/p/2158211/sp/215821100/playManifest/entryId/1_24gfa7qq/format/applehttp/protocol/http/uiConfId/41529681/a.m3u8
+TVP 3 Kraków,http://hbbtvlive.v3.tvp.pl/hbbtvlive/livestream.php?app_id=tvpkrakow
+ANT1 HD,http://antennalivesp-lh.akamaihd.net/i/live_1@715138/master.m3u8
+Music Channel Hungary,http://1music.hu/1music.m3u8
+NASA TV,http://iphone-streaming.ustream.tv/uhls/6540154/streams/live/iphone/playlist.m3u8
+Arise News,http://news.ashttp9.visionip.tv/live/visiontvuk-news-arise-tv-hsslive-25f-16x9-SD/chunklist.m3u8
+Sunburn TV,https://vcndstv.teleosmedia.com/stream/dstv/sunburn/seglist_720p.m3u8
+TVS Western Movies,http://nrpus.bozztv.com/36bay2/gusa-tvswesternmovies/index.m3u8
+ABC News International,http://abclive1-lh.akamaihd.net/i/abc_live04@423398/index_4000_av-b.m3u8
+Lax Sports Network TV,http://snagfilms-lh.akamaihd.net/i/Laxsportsnetwork_1@322790/master.m3u8
+RETRO TV,http://247retrotv.com:1935/live/smil:247retro.smil/chunklist_w1193920237_b1928000_sleng.m3u8
+Black Music Artist TV,http://nimble.dashstreams.net/onestudio/blackmusicartist/playlist.m3u8
+CBN News,http://bcliveuniv-lh.akamaihd.net/i/news_1@194050/index_900_av-b.m3u8
+Voice of America,http://voa-lh.akamaihd.net/i/voa_mpls_tvmc6@320298/master.m3u8
+BBC One,http://a.files.bbci.co.uk/media/live/manifesto/audio_video/simulcast/hls/uk/abr_hdtv/ak/bbc_one_hd.m3u8
