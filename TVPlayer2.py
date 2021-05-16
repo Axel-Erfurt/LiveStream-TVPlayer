@@ -187,7 +187,8 @@ class MainWindow(QMainWindow):
         print('[{}] {}: {}'.format(loglevel, component, message), file=sys.stderr)
         
     def editOwnChannels(self):
-        QDesktopServices.openUrl(QUrl(f"file://{self.own_file}"))
+        mfile = f"{os.path.join(os.path.dirname(sys.argv[0]))}/mychannels.txt"
+        QDesktopServices.openUrl(QUrl(f"file://{mfile}"))
         
     def addToOwnChannels(self):
         k = "Name"
