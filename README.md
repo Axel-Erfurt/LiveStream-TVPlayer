@@ -31,15 +31,15 @@ __Ubuntu / Mint Installation__
 
 open Terminal
 
-> wget 'https://raw.githubusercontent.com/Axel-Erfurt/LiveStream-TVPlayer/master/TVPlayerInstall.sh' -O ~/Downloads/TVPlayerInstall.sh && chmod +x ~/Downloads/TVPlayerInstall.sh && ~/Downloads/TVPlayerInstall.sh 
+```wget 'https://raw.githubusercontent.com/Axel-Erfurt/LiveStream-TVPlayer/master/TVPlayerInstall.sh' -O ~/Downloads/TVPlayerInstall.sh && chmod +x ~/Downloads/TVPlayerInstall.sh && ~/Downloads/TVPlayerInstall.sh```
 
 start app with
 
-> cd ~/.local/share/LiveStream-TVPlayer-master && python3 ./TVPlayer2.py 
+```cd ~/.local/share/LiveStream-TVPlayer-master && python3 ./TVPlayer2.py```
 
 or use TVPlayer2 in start menu
 
 uninstall with
 
-> cd ~/.local/share/ && rm -rf LiveStream-TVPlayer-master
+```cd ~/.local/share/ && rm -rf LiveStream-TVPlayer-master```
 
