@@ -673,7 +673,7 @@ class MainWindow(QMainWindow):
             layout.addRow("Hue", self.hueSlider)
             layout.addRow("Color", self.saturationSlider)
 
-            btn = QPushButton("zurücksetzen")
+            btn = QPushButton("Reset")
             btn.setIcon(QIcon.fromTheme("preferences-color"))
             layout.addRow(btn)
 
