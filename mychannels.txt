@@ -1,0 +1,16 @@
+ARD SD,https://derste247livede.akamaized.net/hls/live/658317/daserste_de/master_640p_1028.m3u8
+ZDF SD,http://zdf-hls-15.akamaized.net/hls/live/2016498/de/low/master.m3u8
+MDR TH SD,https://mdrtvthhls.akamaized.net/hls/live/2016880/mdrtvth/master_640x360.m3u8
+Phoenix SD,http://zdf-hls-19.akamaized.net/hls/live/2016502/de/low/master.m3u8
+RBB SD,http://rbblive-lh.akamaihd.net/i/rbb_berlin@144674/index_3_av-p.m3u8?sd=10&rebase=on
+BR SD,http://mcdn.br.de/bfs_sued/de/profile3/3.m3u8
+HR SD,http://hrhls.akamaized.net/hls/live/2024525-b/hrhls/master-720.m3u8
+Arte SD,http://artelive-lh.akamaihd.net/i/artelive_de@393591/index_3_av-b.m3u8?sd=10&rebase=on
+3 Sat SD,http://zdf-hls-18.akamaized.net/hls/live/2016501/dach/high/master.m3u8
+Welt,https://live2weltcms-lh.akamaihd.net/i/Live2WeltCMS_1@444563/index_1_av-b.m3u8
+ONE SD,http://onelivestream-lh.akamaihd.net/i/one_livestream@568814/index_3_av-b.m3u8?sd=10&rebase=on
+ZDF neo SD,http://zdf-hls-16.akamaized.net/hls/live/2016499/de/low/master.m3u8
+ZDF info SD,http://zdf-hls-17.akamaized.net/hls/live/2016500/de/low/master.m3u8
+NDR SD,https://mcdn.ndr.de/ndr/hls/ndr_fs/ndr_nds/master_360.m3u8
+WDR SD,http://wdrfsgeo-lh.akamaihd.net/i/wdrfs_geogeblockt@530016/index_1028_av-p.m3u8?sd=10&rebase=on
+Tagesschau SD,http://tagesschau-lh.akamaihd.net/i/tagesschau_1@119231/index_1216_av-b.m3u8?sd=10&rebase=on
