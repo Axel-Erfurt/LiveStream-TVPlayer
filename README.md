@@ -11,6 +11,19 @@ __Requirements:__
 
 made and testet in Linux Mint 20
 
+__Playlists__
+
+create a txt file inside the LiveStream-Tv folder, for example Favourites.txt
+
+Format:
+
+```
+Name 1,url
+Name 2,url
+```
+
+Every text file becomes a menu.
+
 __Shortcuts:__
 - q = Exit
 - f = toggle Fullscreen
