@@ -6,6 +6,7 @@ __Requirements:__
 
 - [python3](https://www.python.org/)
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/download5)
+- libmpv
 - ffmpeg for recording TV
 
 made and testet in Linux Mint 20
